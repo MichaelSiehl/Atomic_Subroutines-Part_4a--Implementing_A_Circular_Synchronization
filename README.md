@@ -8,4 +8,6 @@ Sometimes it may be required that a (customized) synchronization process does sy
 
 In the first part (see the above link) we did implement a customized (or user-defined) version of (Fortran 2018-like) EventPost and EventWait synchronization procedures. Under some conditions these do not work properly. (Example: With OpenCoarrays/gfortran at program start when the execution of the customized EventPost (atomic_define) does temporal precede the execution of the customized EventWait (atomic_ref).<br />
 
-This GitHub repository contains a first implementation of a customized synchronization procedure that can synchronize itself by applying a circular (or ring) synchronization. <br />
+This GitHub repository contains a first implementation of a customized synchronization procedure that can synchronize itself by applying a circular (or ring) synchronization. Again, only few lines of Fortran code were required to accomplish that. <br />
+
+# How it works
