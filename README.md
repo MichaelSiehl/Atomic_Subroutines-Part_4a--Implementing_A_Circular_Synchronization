@@ -1,0 +1,2 @@
+# Atomic_Subroutines-Part_4a--Implementing_A_Circular_Synchronization
+Fortran 2008 coarray programming with unordered execution segments (user-defined ordering) and customized synchronization procedures - Atomic Subroutines - Part 4a: How to cope with unreliable data transfers with low-level PGAS programming - allow for safe remote data movement among a number of coarray images. Implementing a circular synchronization.
