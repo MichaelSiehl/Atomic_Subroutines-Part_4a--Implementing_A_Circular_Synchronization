@@ -291,3 +291,33 @@ Embarassing few lines of code were required to implement circularity with the ex
   .
 ```
 
+```fortran
+ subroutine OOOPimscEventWaitScalar_intImageActivityFlag99_CA (Object_CA, intCheckImageActivityFlag, &
+                  intNumberOfImages, intA_RemoteImageNumbers, logArrayIndexIsThisImage, &
+                  intA_RemoteImageAndItsAdditionalAtomicValue, logExecuteSyncMemory, &
+                  intCheckRemoteAbortOfSynchronization, logRemoteAbortOfSynchronization, intRemoteImageThatDidTheAbort, &
+                  intNumberOfSuccessfulRemoteSynchronizations, intA_TheSuccessfulImageNumbers, &
+                  intNumberOfFailedRemoteSynchronizations, intA_TheFailedImageNumbers, &
+                  logActivateCircularSynchronization)
+.
+.
+          !
+          ! ***** activate a circular synchronization: *****
+          else ! the synchronization was not successful:
+            if (logActivateCircularSynch) then ! activate a circular synchronization
+              intCount2 = intCount2 + 1
+              if (intCount2 >= 100) then ! choosing a higher value will reduce the required remote data
+                                         ! transfer but will also make the synchronization slower
+                intCount2 = 0
+                call OOOPimscEventPostScalar_intImageActivityFlag99_CA (Object_CA, &
+                     OOOPimscEnum_ImageActivityFlag % WaitingForEventPost, &
+                     intImageNumber, intArrayIndex = this_image(), logExecuteSyncMemory = .false.)
+              end if
+            end if
+          end if
+          ! ***** end of circular synchronization *****
+  .
+  .
+```
+
+See the OOOPimsc_admImageStatus_CA.f90 source code file for the complete code.
