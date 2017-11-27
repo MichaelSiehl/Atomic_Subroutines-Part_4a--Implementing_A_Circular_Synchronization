@@ -15,7 +15,7 @@ The codes in the src folder should be compiled and run with OpenCoarray/gfortran
 
 The Main.f90 contains a simple test case that we do compile with different settings from the code. The test case does execute a customized EventWait on coarray image 1, a customized EventPost on coarray images 3-6 resp., and a remotely initiated synchronization abort on coarray image 2 (which itself is not part of the synchronization process) after 2 seconds. (The abort does only occur if the synchronization process is still running after 2 seconds). See the following outputs from distinct program runs with different settings from the code in Main.f90:<br />
 
-# 1. successful regular (non-circular) synchronization process:
+# 1. Successful regular (non-circular) synchronization process:
 We run the test case as non-circular synchronization (the logActivateCircularSynchronization argument is set to false for calling the customized EventPost and EventWait). We do execute the customized EventWait on image 1 without any time delay. The calls to the customized EventPost on coarray images 3-6 are getting executed with a delay of 0.5 seconds. Thus, the EventWait does temporal precede the calls to EventPost.<br />
 
 Main.f90:<br />
@@ -138,3 +138,69 @@ Output from a program run:
  the failed image numbers:           0           0           0           0
 ```
 Here, the 'remote abort of synchronization status' is FALSE. Thus, the synchronization process as a whole did complete successfully before the synchronization abort was initiated remotely.<br />
+
+# 2. Failure (partly) with regular (non-circular) synchronization process:
+Again, we run the test case as non-circular synchronization (the logActivateCircularSynchronization argument is set to false for calling the customized EventPost and EventWait). But this time, we do execute the customized EventWait on image 1 with a time delay of 0.5 seconds, whereas the calls to the customized EventPost on coarray images 3-6 are getting executed without any delay. Thus, with this test case the calls to EventPost do temporal precede the call to EventWait.<br />
+
+Output from a program run:
+```fortran
+ invovled remote images:                        3           0           5           0
+ and the additional atomic values:              6           0          10           0
+ remote abort of synchronization (TRUE/FALSE): T
+ remote image that did the abort:           2
+ number of successful remote synchronizations:           2
+ the successful image numbers:           3           5           0           0
+ number of failed remote synchronizations:           2
+ the failed image numbers:           4           6           0           0
+```
+Here, the 'remote abort of synchronization status' is TRUE. Thus, the synchronization process was aborted by another coarray image (image 2). The 'number of successful remote synchronizations' is 2: two of the involved remote images (3,4,5,6) did synchronize successfully with the customized EventWait on image 1, two coarray images did fail to synchronize. The synchronization process (customized EventPost + customized EventWait) must be repeated.<br />
+
+# 3. successful circular synchronization process:
+As with the second test case (see above), we run the test case with calls to customized EventPost temporal preceding the call to the customized EventWait.<br />
+But this time, we do run the test case as circular synchronization (the logActivateCircularSynchronization argument is set to TRUE for calling the customized EventPost and EventWait).<br />
+
+Main.f90:<br />
+```fortran
+  !
+  !******************************************************************
+  !** on image 1: initiate a customized EventWait *******************
+  !******************************************************************
+  !
+  if (this_image() == 1) then ! do a customized Event Wait on image 1
+  .
+  .
+  !
+    call OOOPimscEventWaitScalar_intImageActivityFlag99_CA (OOOPimscImageStatus_CA_1, intImageActivityFlag, &
+   .
+  .
+      logActivateCircularSynchronization = .true.)
+    !
+ .
+ .
+  !
+  !******************************************************************
+  !** on all other images: do a customized EventPost ****************
+  !******************************************************************
+  !
+  if (this_image() > 2) then
+    !
+    call OOOPimscEventPostScalar_intImageActivityFlag99_CA (OOOPimscImageStatus_CA_1, intImageActivityFlag, &
+ .
+ .
+      logActivateCircularSynchronization = .true.)
+.
+.
+```
+
+Output from a program run:
+```fortran
+ invovled remote images:                        3           4           5           6
+ and the additional atomic values:              6           8          10          12
+ remote abort of synchronization (TRUE/FALSE): F
+ remote image that did the abort:           0
+ number of successful remote synchronizations:           4
+ the successful image numbers:           6           3           4           5
+ number of failed remote synchronizations:           0
+ the failed image numbers:           0           0           0           0
+```
+This time, the 'remote abort of synchronization status' is FALSE. Thus, the CIRCULAR synchronization process as a whole did complete successfully before the synchronization abort was initiated remotely.<br />
