@@ -15,7 +15,7 @@ The codes in the src folder should be compiled and run with OpenCoarray/gfortran
 
 The Main.f90 contains a simple test case that we do compile with different settings from the code. The test case does execute a customized EventWait on coarray image 1, a customized EventPost on coarray images 3-6 resp., and a remotely initiated synchronization abort on coarray image 2 (which itself is not part of the synchronization process) after 2 seconds. (The abort does only occur if the synchronization process is still running after 2 seconds). See the following outputs from distinct program runs with different settings from the code in Main.f90:<br />
 
-# 1
+# 1 successful regular (non-circular) synchronization process:
 We run the test case as non-circular synchronization (the logActivateCircularSynchronization argument is set to false for calling the customized EventPost and EventWait). We do execute the customized EventWait on image 1 without any time delay. The calls to the customized EventPost on coarray images 3-6 are getting executed with a delay of 0.5 seconds. Thus, the EventWait does temporal precede the calls to EventPost.<br />
 
 Main.f90:<br />
