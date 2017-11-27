@@ -249,3 +249,45 @@ Output from a program run:
 ```
 This time, the 'remote abort of synchronization status' is FALSE. Thus, the CIRCULAR synchronization process as a whole did complete successfully before the synchronization abort was initiated remotely.<br />
 (Another working option would be to place SYNC IMAGES statements in the code. But the aim here was to show the same effect with customized circular synchronization procedures. Besides, SYNC IMAGES would only work with ordered execution segments.)<br />
+
+# Implementing a circular synchronization with the customized EventPost / EventWait procedures
+Embarassing few lines of code were required to implement circularity with the exising customized EventPost / EventWait procedures:
+
+```fortran
+ subroutine OOOPimscEventPostScalar_intImageActivityFlag99_CA (Object_CA, intImageActivityFlag, &
+                                intImageNumber, intArrayIndex, logExecuteSyncMemory, &
+                                intAdditionalAtomicValue, intEnumStepWidth, &
+                                logActivateCircularSynchronization)
+.
+.
+  !
+  ! ***** activate a circular synchronization: *****
+  ! (to allow for time-independent calls to customized EventPost / EventWait)
+  if (logActivateCircularSynch) then ! activate a circular synchronization
+      !
+        do
+          if (OOOPimscGAElement_check_atomic_intImageActivityFlag99_CA (Object_CA, &
+                  OOOPimscEnum_ImageActivityFlag % WaitingForEventPost, &
+                  intArrayIndex = intImageNumber, logExecuteSyncMemory = .false.)) then
+            ! the event wait image is waiting for the event post:
+            ! do the event post:
+            call OOOPimscSAElement_atomic_intImageActivityFlag99_CA (Object_CA, intPackedEnumValue, &
+                 intImageNumber, intArrIndex, logExecuteSyncMemory=logSyncMemoryExecution)
+            exit
+          else ! the event wait image does not signal a WaitingForEventPost:
+            ! check for a remote synchronization abort
+            intCheckRemoteAbortOfSynchronization = OOOPimscEnum_ImageActivityFlag % RemoteAbortOfSynchronization
+            if (OOOPimscGAElement_check_atomic_intImageActivityFlag99_CA (Object_CA, &
+              intCheckImageActivityFlag = intCheckRemoteAbortOfSynchronization, &
+              intArrayIndex = this_image(), logExecuteSyncMemory = .false.)) then
+              exit
+            end if
+          end if
+          !
+         end do
+  ! ***** end of circular synchronization *****
+  !
+  .
+  .
+```
+
