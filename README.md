@@ -142,6 +142,50 @@ Here, the 'remote abort of synchronization status' is FALSE. Thus, the synchroni
 # 2. Failure (partly) with regular (non-circular) synchronization process:
 Again, we run the test case as non-circular synchronization (the logActivateCircularSynchronization argument is set to false for calling the customized EventPost and EventWait). But this time, we do execute the customized EventWait on image 1 with a time delay of 0.5 seconds, whereas the calls to the customized EventPost on coarray images 3-6 are getting executed without any delay. Thus, with this test case the calls to EventPost do temporal precede the call to EventWait.<br />
 
+Main.f90:<br />
+```fortran
+  !
+  !******************************************************************
+  !** on image 1: initiate a customized EventWait *******************
+  !******************************************************************
+  !
+  if (this_image() == 1) then ! do a customized Event Wait on image 1
+  .
+    !
+    ! wait some time:
+    call cpu_time(reaTime1)
+    do
+      call cpu_time(reaTime2)
+      reaTimeShift = reaTime2 - reaTime1
+      if (reaTimeShift > 0.5) exit ! ! waiting time in seconds
+    end do
+    ! *****
+ .
+ .
+  end if
+  !
+  !
+  !******************************************************************
+  !** on all other images: do a customized EventPost ****************
+  !******************************************************************
+  !
+  if (this_image() > 2) then
+  ! on all other images do a customized EventPost as part of the synchronization:
+    !
+    ! wait some time:
+    call cpu_time(reaTime1)
+    do
+      call cpu_time(reaTime2)
+      reaTimeShift = reaTime2 - reaTime1
+      if (reaTimeShift > 0.0) exit ! waiting time in seconds
+    end do
+    !
+.
+.
+  end if
+  !
+```
+
 Output from a program run:
 ```fortran
  invovled remote images:                        3           0           5           0
