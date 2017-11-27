@@ -248,3 +248,4 @@ Output from a program run:
  the failed image numbers:           0           0           0           0
 ```
 This time, the 'remote abort of synchronization status' is FALSE. Thus, the CIRCULAR synchronization process as a whole did complete successfully before the synchronization abort was initiated remotely.<br />
+(Another working option would be to place SYNC IMAGES statements in the code. But the aim here was to show the same effect with customized circular synchronization procedures. Besides, SYNC IMAGES would only work with ordered execution segments.)<br />
