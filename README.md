@@ -278,8 +278,8 @@ Embarassing few lines of code were required to implement circularity with the ex
             ! check for a remote synchronization abort
             intCheckRemoteAbortOfSynchronization = OOOPimscEnum_ImageActivityFlag % RemoteAbortOfSynchronization
             if (OOOPimscGAElement_check_atomic_intImageActivityFlag99_CA (Object_CA, &
-              intCheckImageActivityFlag = intCheckRemoteAbortOfSynchronization, &
-              intArrayIndex = this_image(), logExecuteSyncMemory = .false.)) then
+                intCheckImageActivityFlag = intCheckRemoteAbortOfSynchronization, &
+                intArrayIndex = this_image(), logExecuteSyncMemory = .false.)) then
               exit
             end if
           end if
