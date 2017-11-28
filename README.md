@@ -197,7 +197,7 @@ Output from a program run:
  number of failed remote synchronizations:           2
  the failed image numbers:           4           6           0           0
 ```
-Here, the 'remote abort of synchronization status' is TRUE. Thus, the synchronization process was aborted by another coarray image (image 2). The 'number of successful remote synchronizations' is 2: two of the involved remote images (3,4,5,6) did synchronize successfully with the customized EventWait on image 1, two coarray images did fail to synchronize. The synchronization process (customized EventPost + customized EventWait) must be repeated.<br />
+Here, the 'remote abort of synchronization status' is TRUE. Thus, the synchronization process was aborted by another coarray image (image 2). The 'number of successful remote synchronizations' is 2: two of the involved remote images (3 and 5) did synchronize successfully with the customized EventWait on image 1, two coarray images (4 and 6) did fail to synchronize. The synchronization process (customized EventPost + customized EventWait) must be repeated for the failed images.<br />
 
 # 3. successful circular synchronization process:
 As with the second test case (see above), we run the test case with calls to customized EventPost temporal preceding the call to the customized EventWait.<br />
@@ -248,7 +248,7 @@ Output from a program run:
  the failed image numbers:           0           0           0           0
 ```
 This time, the 'remote abort of synchronization status' is FALSE. Thus, the CIRCULAR synchronization process as a whole did complete successfully before the synchronization abort was initiated remotely.<br />
-(Another working option would be to place SYNC IMAGES statements in the code. But the aim here was to show the same effect with customized circular synchronization procedures. Besides, SYNC IMAGES would only work with ordered execution segments.)<br />
+(Another working option would be to place SYNC IMAGES statements in the code. But the aim here was to show the same effect with customized circular synchronization procedures. Besides, SYNC IMAGES could only work with ordered execution segments.)<br />
 
 # Implementing a circular synchronization with the customized EventPost / EventWait procedures
 Embarassing few lines of code were required to implement circularity with the exising customized EventPost / EventWait procedures:
